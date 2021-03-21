@@ -1,33 +1,44 @@
 const endpointURL = "http://localhost:9000/graphql"
-const headers = {
-  "Content-Type": "application/json"
+
+
+async function makeQuery(bodyObj) {
+  const response = await fetch(endpointURL, {
+    method: "POST",
+    body: JSON.stringify(bodyObj),
+    headers: {
+      "Content-Type": "application/json"
+    }
+  })
+  const responseBody = await response.json()
+  // Error handling
+  if (responseBody.errors?.length > 0) {
+    const messages = responseBody.errors.map(error => error.message).join("\n")
+    throw new Error(messages)
+  }
+  return responseBody.data
 }
 
 export async function loadJobs() {
-  const body = JSON.stringify({
+  const responseData = await makeQuery({
     query: `
       {
         jobs{
-          id,
-          title,
+          id
+          title
           company{
             name
           }
         }
       }
     `
-  })
-  const response = await fetch(endpointURL, {
-    method: "POST",
-    body,
-    headers
-  })
-  const responseBody = await response.json()
-  return responseBody.data.jobs;
+  });
+  const { jobs, errors } = responseData;
+  console.log(jobs, errors)
+  return responseData.jobs;
 }
 
 export async function getJob(jobId) {
-  const body = JSON.stringify({
+  const responseData = await makeQuery({
     variables: { id: jobId },
     query: `
     query JobQuery($id:ID!){
@@ -42,18 +53,12 @@ export async function getJob(jobId) {
         }
       }
     `
-  })
-  const response = await fetch(endpointURL, {
-    method: "POST",
-    body,
-    headers
-  })
-  const responseBody = await response.json()
-  return responseBody.data.job;
+  });
+  return responseData.job;
 }
 
 export async function getCompany(companyId) {
-  const body = JSON.stringify({
+  const responseData = await makeQuery({
     variables: { id: companyId },
     query: `
       query CompanyQuery($id:ID!){
@@ -64,12 +69,6 @@ export async function getCompany(companyId) {
         }
       }
     `
-  })
-  const response = await fetch(endpointURL, {
-    method: "POST",
-    body,
-    headers
-  })
-  const responseBody = await response.json()
-  return responseBody.data.company;
+  });
+  return responseData.company;
 }

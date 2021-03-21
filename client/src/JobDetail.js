@@ -6,16 +6,17 @@ export class JobDetail extends Component {
   constructor(props) {
     super(props);
     const { jobId } = this.props.match.params;
-    this.state = { jobId, job: undefined };
+    this.state = { jobId, job: undefined, loading: true };
   }
   componentDidMount() {
     getJob(this.state.jobId).then(job => {
-      this.setState({ job })
+      this.setState({ job, loading: false })
     })
   }
   render() {
-    const { job } = this.state;
-    if (!job) return <p>Loading...</p>
+    const { job, loading } = this.state;
+    if (loading) return <p>Loading...</p>
+    if (!job) return <p>Job could not be found</p>
     return (
       <div>
         <h1 className="title">{job.title}</h1>
