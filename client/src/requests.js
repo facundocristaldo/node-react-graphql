@@ -61,7 +61,7 @@ export async function loadJobs() {
         }
       }
     `
-  const { data: { jobs } } = await client.query({ query })
+  const { data: { jobs } } = await client.query({ query, fetchPolicy: "" })
   return jobs;
 }
 
@@ -92,10 +92,37 @@ export async function createJob(input) {
           id
           title
           description
+          company{
+            id
+            name
+          }
         }
       }
     `
-  const { data: { job } } = await client.mutate({ mutation, variables })
+  const { data: { job } } = await client.mutate({
+    mutation,
+    variables,
+    update: (cache, mutationResult) => {
+      const { data } = mutationResult
+      cache.writeQuery({
+        variables: { id: data.job.id },
+        query: gql`
+        query JobQuery($id:ID!){
+            job(id:$id){
+              id
+              title
+              description
+              company{
+                id
+                name
+              }
+            }
+          }
+        `,
+        data
+      })
+    }
+  })
   return job;
 }
 
