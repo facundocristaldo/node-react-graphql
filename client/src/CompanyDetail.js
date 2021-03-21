@@ -17,6 +17,7 @@ export class CompanyDetail extends Component {
   render() {
     const { company, loading, error } = this.state;
     if (loading) return <p>Loading...</p>
+    if (!company) return <p>Company could not be found</p>
     return (
       <div>
         <h1 className="title">{company.name}</h1>
