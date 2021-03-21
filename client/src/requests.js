@@ -28,9 +28,10 @@ export async function loadJobs() {
 
 export async function getJob(jobId) {
   const body = JSON.stringify({
+    variables: { id: jobId },
     query: `
-      {
-        job(id:"${jobId}"){
+    query JobQuery($id:ID!){
+        job(id:$id){
           id
           title
           description
@@ -53,9 +54,10 @@ export async function getJob(jobId) {
 
 export async function getCompany(companyId) {
   const body = JSON.stringify({
+    variables: { id: companyId },
     query: `
-      {
-        company(id:"${companyId}"){
+      query CompanyQuery($id:ID!){
+        company(id:$id){
             id
             name
             description
