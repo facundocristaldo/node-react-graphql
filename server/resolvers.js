@@ -1,20 +1,9 @@
 const db = require("./db")
 
 const Query = {
-  jobs: () => getJobs()
-}
-
-
-const getJobs = () => {
-  return db.jobs.list()
-  // This is okay, but there´s another way
-  // .map(job => ({
-  //   id: job.id,
-  //   title: job.title,
-  //   description: job.description,
-  //   company: db.companies.list().find(comp => comp.id === job.companyId)
-  // })
-  // )
+  job: (root, args) => db.jobs.get(args.id),
+  jobs: () => db.jobs.list(),
+  company: (root, args) => db.companies.get(args.id)
 }
 
 //Declare a Job resolver
