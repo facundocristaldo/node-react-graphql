@@ -7,9 +7,16 @@ const Query = {
 }
 
 const Mutation = {
-  createJob: (root, { input }) => {
-    const jobId = db.jobs.create(input)
-    return db.jobs.get(jobId)
+  createJob: async (root, { input }, context) => {
+    // Check if authenticated
+    const { user } = context;
+    if (user) {
+      input["companyId"] = user.companyId
+      const jobId = db.jobs.create(input)
+      return db.jobs.get(jobId)
+    } else {
+      throw new Error("Not Authorized")
+    }
   }
 }
 

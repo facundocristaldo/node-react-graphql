@@ -1,13 +1,19 @@
+import { getAccessToken, isLoggedIn } from "./auth"
+
 const endpointURL = "http://localhost:9000/graphql"
 
 
 async function makeQuery(bodyObj) {
+  const headers = {
+    "Content-Type": "application/json"
+  }
+  if (isLoggedIn()) {
+    headers["Authorization"] = "Bearer " + getAccessToken()
+  }
   const response = await fetch(endpointURL, {
     method: "POST",
     body: JSON.stringify(bodyObj),
-    headers: {
-      "Content-Type": "application/json"
-    }
+    headers
   })
   const responseBody = await response.json()
   // Error handling
@@ -50,6 +56,22 @@ export async function getJob(jobId) {
             id
             name
           }
+        }
+      }
+    `
+  });
+  return responseData.job;
+}
+
+export async function createJob(input) {
+  const responseData = await makeQuery({
+    variables: { input },
+    query: `
+      mutation CreateJob($input:createJobInput){
+        job: createJob(input:$input){
+          id
+          title
+          description
         }
       }
     `
